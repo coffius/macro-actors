@@ -75,10 +75,7 @@ object ActorGenerator {
       val methodName = methodDesc.methodSymbol.name
       val msgClassName = messageClassName(methodDesc.methodSymbol)
       val methodParams = generateMethodParams(methodDesc.params)
-      s"""|     case $msgClassName$methodParams =>
-          |       val senderRef = sender()
-          |       val asyncResult = internalImpl.$methodName$methodParams
-          |       asyncResult.onSuccess { case value => senderRef ! value }""".stripMargin
+      s"""|     case $msgClassName$methodParams => internalImpl.$methodName$methodParams.pipeTo(sender())""".stripMargin
     }.mkString("\n")
   }
 
@@ -96,6 +93,7 @@ object ActorGenerator {
   private def generateActorImports(traitTypeSymbol: ru.Symbol): String = {
     s"""import akka.actor.Actor
        |import ${traitTypeSymbol.fullName}
+       |import akka.pattern.pipe
      """.stripMargin
   }
 
