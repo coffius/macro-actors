@@ -1,4 +1,4 @@
-package io.koff.generated
+package io.koff.generator
 
 import akka.actor.{ActorSystem, Props}
 
@@ -14,9 +14,8 @@ object ActorGenerator {
    * Generate an actor implementation of a trait `Trait`
    * @param actorSystem actor system for internal actor
    */
-  def gen[Trait, Impl <: Trait](actorSystem: ActorSystem, impl: Impl)
-                               (implicit traitTag: ru.TypeTag[Trait], implTag: ru.TypeTag[Impl]): Trait = {
-    val traitType = ru.typeOf[Trait](traitTag)
+  def gen[Trait: ru.TypeTag](actorSystem: ActorSystem, impl: Trait): Trait = {
+    val traitType = ru.typeOf[Trait]
 
     val traitTypeSymbol = traitType.typeSymbol
     //get methods from a trait without a constructor

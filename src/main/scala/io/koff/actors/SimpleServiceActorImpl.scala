@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 import io.koff.services.SimpleService
 
-class SimpleServiceActorImpl(private val actorRef: ActorRef) extends SimpleService {
+class SimpleServiceActorImpl(private val actorRef: ActorRef) extends AsyncService {
 
   private implicit val timeout = Timeout(5 seconds)
 

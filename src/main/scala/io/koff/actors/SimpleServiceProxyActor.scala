@@ -6,7 +6,7 @@ import io.koff.services.SimpleService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class SimpleServiceProxyActor(private val internalImpl: SimpleService) extends Actor {
+class SimpleServiceProxyActor(private val internalImpl: AsyncService) extends Actor {
   import context.dispatcher
 
   def receive = {

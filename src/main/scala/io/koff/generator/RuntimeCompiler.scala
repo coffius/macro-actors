@@ -1,4 +1,4 @@
-package io.koff.generated
+package io.koff.generator
 
 import scala.tools.nsc.{Global, Settings}
 import tools.nsc.util.BatchSourceFile
