@@ -32,14 +32,13 @@ class ActorGeneratorSpec
 
   "it should throw an exception" in {
     val fake = stub[TestService]
-    (fake.asyncOperation _).when(*).throws(new UnsupportedOperationException)
+    (fake.asyncOperation _).when(*).throws(new TestException)
 
     val generated = ActorGenerator.gen(system, fake)
     val asyncResult = generated.asyncOperation("test_value")
-    val result = Await.result(asyncResult, 10 seconds)
-    result shouldBe "ok"
-    //implement the test
-    true shouldBe false
+    intercept[TestException] {
+      Await.result(asyncResult, 10 seconds)
+    }
   }
 
   "it should support unit methods" in {
@@ -47,6 +46,8 @@ class ActorGeneratorSpec
     true shouldBe false
   }
 }
+
+class TestException extends Exception
 
 trait TestService {
   def asyncOperation(value: String): Future[String]

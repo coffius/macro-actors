@@ -75,7 +75,7 @@ object ActorGenerator {
       val methodName = methodDesc.methodSymbol.name
       val msgClassName = messageClassName(methodDesc.methodSymbol)
       val methodParams = generateMethodParams(methodDesc.params)
-      s"""|     case $msgClassName$methodParams => internalImpl.$methodName$methodParams.pipeTo(sender())""".stripMargin
+      s"""|     case $msgClassName$methodParams => tryIt(internalImpl.$methodName$methodParams).pipeTo(sender())""".stripMargin
     }.mkString("\n")
   }
 
@@ -94,6 +94,7 @@ object ActorGenerator {
     s"""import akka.actor.Actor
        |import ${traitTypeSymbol.fullName}
        |import akka.pattern.pipe
+       |import io.koff.generator.utils.ActorUtils._
      """.stripMargin
   }
 
