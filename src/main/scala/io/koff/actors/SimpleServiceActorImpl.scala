@@ -1,29 +1,20 @@
 package io.koff.actors
 
 import akka.actor.ActorRef
-import akka.util.Timeout
 import akka.pattern.ask
-import scala.concurrent.Future
+import akka.util.Timeout
+import io.koff.services.SimpleService
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import io.koff.services.SimpleService
-
-class SimpleServiceActorImpl(private val actorRef: ActorRef) extends AsyncService {
-  import scala.concurrent.ExecutionContext.Implicits.global
+class SimpleServiceActorImpl(private val actorRef: ActorRef) extends SimpleService {
   private implicit val timeout = Timeout(5 seconds)
 
   override def hello(name: String): scala.concurrent.Future[String] = {
-    actorRef.?(helloMsg(name)).mapTo[Either[Throwable, String]].flatMap {
-      case Right(value) => Future.successful(value)
-      case Left(exc) => Future.failed(exc)
-    }
+    actorRef.?(helloMsg(name)).mapTo[String]
   }
   override def goodBye(name: String): scala.concurrent.Future[String] = {
-    actorRef.?(goodByeMsg(name)).mapTo[Either[Throwable, String]].flatMap {
-      case Right(value) => Future.successful(value)
-      case Left(exc) => Future.failed(exc)
-    }
+    actorRef.?(goodByeMsg(name)).mapTo[String]
   }
-
 }
