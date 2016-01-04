@@ -2,14 +2,14 @@ package io.koff.actors
 
 import akka.actor.Actor
 
-case class hello(name: String)
-case class goodBye(name: String)
+case class helloMsg(name: String)
+case class goodByeMsg(name: String)
 
 class SimpleServiceActor extends Actor {
   def receive = {
-    case hello(name) =>
+    case helloMsg(name) =>
       sender ! "hello " + name
-    case goodBye(name) =>
+    case goodByeMsg(name) =>
       sender ! "goodbye " + name
   }
 }

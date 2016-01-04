@@ -23,11 +23,11 @@ class ProblemActor(private val internalImpl: AsyncService) extends Actor {
   import context.dispatcher
 
   def receive = {
-    case hello(name) =>
+    case helloMsg(name) =>
       val senderRef = sender()
       val asyncResult = internalImpl.hello(name)
       asyncResult.onSuccess { case value => senderRef ! value }
-    case goodBye(name) =>
+    case goodByeMsg(name) =>
       internalImpl.goodBye(name).pipeTo(sender())
   }
 }
@@ -39,11 +39,11 @@ object ActorProblem {
     val impl = new AsyncServiceImpl
     val actor = system.actorOf(Props(classOf[ProblemActor], impl), "SimpleServiceProxyActor")
     //it's ok
-    val result = ask(actor, hello("scala")).mapTo[String]
+    val result = ask(actor, helloMsg("scala")).mapTo[String]
     val resultString = Await.result(result, 10 seconds)
 
     //there is AskTimeoutException
-    val badResult = ask(actor, goodBye("scala")).mapTo[String]
+    val badResult = ask(actor, goodByeMsg("scala")).mapTo[String]
     val bad = Await.result(badResult, 10 seconds)
 
     println("result: " + bad)

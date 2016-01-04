@@ -18,8 +18,7 @@ class ActorGeneratorSpec
 {
   override def afterAll(): Unit = shutdown()
 
-  "it should generate intermediate classes" in {
-
+  "it should generate intermediate classes and exec a trait method" in {
     val fake = stub[TestService]
     (fake.asyncOperation _).when("test_value").returns(Future.successful("ok"))
 
@@ -29,6 +28,23 @@ class ActorGeneratorSpec
     result shouldBe "ok"
 
     (fake.asyncOperation _).verify("test_value")
+  }
+
+  "it should throw an exception" in {
+    val fake = stub[TestService]
+    (fake.asyncOperation _).when(*).throws(new UnsupportedOperationException)
+
+    val generated = ActorGenerator.gen(system, fake)
+    val asyncResult = generated.asyncOperation("test_value")
+    val result = Await.result(asyncResult, 10 seconds)
+    result shouldBe "ok"
+    //implement the test
+    true shouldBe false
+  }
+
+  "it should support unit methods" in {
+    //implement the test
+    true shouldBe false
   }
 }
 

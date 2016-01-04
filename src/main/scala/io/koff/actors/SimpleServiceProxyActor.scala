@@ -3,6 +3,8 @@ package io.koff.actors
 import akka.actor.Actor
 import akka.pattern.pipe
 
+import scala.util.control.NonFatal
+
 class SimpleServiceProxyActor(private val internalImpl: AsyncService) extends Actor {
   import context.dispatcher
 
@@ -12,8 +14,14 @@ class SimpleServiceProxyActor(private val internalImpl: AsyncService) extends Ac
 //      val asyncResult = internalImpl.hello(name)
 //      val result = Await.result(asyncResult, 10 seconds)
 //      sender ! result
-    case hello(name) => internalImpl.hello(name).pipeTo(sender())
-    case goodBye(name) =>
+    case helloMsg(name) =>
+      internalImpl
+      .hello(name)
+      .map(Right(_))
+      .recover {
+        case NonFatal(ex) => Left(ex)
+      }.pipeTo(sender())
+    case goodByeMsg(name) =>
       internalImpl
         .goodBye(name)
         .onSuccess {
