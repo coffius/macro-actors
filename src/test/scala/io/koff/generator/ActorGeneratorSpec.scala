@@ -19,7 +19,7 @@ class ActorGeneratorSpec
   override def afterAll(): Unit = shutdown()
 
   "it should generate intermediate classes and exec a trait method" in {
-    val fake = stub[TestService]
+    val fake = stub[AsyncTestService]
     (fake.asyncOperation _).when("test_value").returns(Future.successful("ok"))
 
     val generated = ActorGenerator.gen(system, fake)
@@ -31,7 +31,7 @@ class ActorGeneratorSpec
   }
 
   "it should throw an exception" in {
-    val fake = stub[TestService]
+    val fake = stub[AsyncTestService]
     (fake.asyncOperation _).when(*).throws(new TestException)
 
     val generated = ActorGenerator.gen(system, fake)
@@ -41,14 +41,20 @@ class ActorGeneratorSpec
     }
   }
 
-  "it should support unit methods" in {
-    //implement the test
-    true shouldBe false
+  "it should support only scala.Future[_] methods" in {
+    val fake = mock[TestService]
+    intercept[IllegalArgumentException] {
+      ActorGenerator.gen(system, fake)
+    }
   }
 }
 
 class TestException extends Exception
 
-trait TestService {
+trait AsyncTestService {
   def asyncOperation(value: String): Future[String]
+}
+
+trait TestService {
+  def operation(value: String): Option[String]
 }

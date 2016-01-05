@@ -2,6 +2,7 @@ package io.koff.generator
 
 import akka.actor.{ActorSystem, Props}
 
+import scala.concurrent.Future
 import scala.reflect.runtime.{currentMirror => cm, universe => ru}
 
 object ActorGenerator {
@@ -9,6 +10,7 @@ object ActorGenerator {
   case class MethodDesc(methodSymbol: ru.MethodSymbol, params : List[List[MethodParamDesc]], returnType: ru.Type)
 
   private val compiler = new RuntimeCompiler()
+  private val futureType = ru.typeOf[Future[_]].typeSymbol
 
   /**
    * Generate an actor implementation of a trait `Trait`
@@ -135,6 +137,7 @@ object ActorGenerator {
       val methodParams = generateMethodParams(methodDesc.params)
       val paramsWithTypes = generateMethodParamsWithType(methodDesc.params)
       val fullReturnType = methodDesc.methodSymbol.returnType
+      require(fullReturnType.typeSymbol == futureType, s"only scala.Future[_] is supported: ${fullReturnType.typeSymbol}")
       val ru.TypeRef(_, _, typeParams) = fullReturnType
       val typeParam = typeParams.head
 
