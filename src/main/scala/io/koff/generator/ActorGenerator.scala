@@ -22,14 +22,12 @@ object ActorGenerator {
     val traitTypeSymbol = traitType.typeSymbol
     //get methods from a trait without a constructor
     val methods = traitType.decls.filter(_.isMethod).map(_.asMethod).filter(!_.isConstructor).toSeq
-    //translate information about trait methods in internal structure
+    //translate information about trait methods in an internal structure
     val withParamsAndReturn = methods.map{ methodSymb =>
       val params = methodSymb.paramLists.map(_.map(_.asTerm).map(termToNameAndType))
       val returnType = methodSymb.returnType
       MethodDesc(methodSymb, params, returnType)
     }
-    println("decls: " + traitTypeSymbol)
-    println("with params : " + withParamsAndReturn)
 
     //generate a code string
     val codeString = generateCode(traitTypeSymbol, withParamsAndReturn)
@@ -207,6 +205,9 @@ object ActorGenerator {
      """.stripMargin
   }
 
+  /**
+   * Get a full package name of symbol
+   */
   private def packageName(sym: ru.Symbol): String = {
     def enclosingPackage(sym: ru.Symbol): ru.Symbol = {
       if (sym == ru.NoSymbol) ru.NoSymbol
