@@ -1,13 +1,13 @@
 # macro-actors
 Replacement of TypedActors.
 
-The current state of this lib is a proof of concept. 
+**WARN: The current state of this lib is a proof of concept.**
  
 Now it can generate an intermediate code by a trait and its implementation in order to make middleman-actors.
 
 **Why?**
 
-The main reason why this library was created is the same as it was at TypedActors - to make communication between actor systems and non-actor code simpler.
+The main reason why this library was created is the same as it was for TypedActors - to make communication between actor systems and non-actor code simpler.
 Another reason is to unleash the power of akka for using in non-actor systems :)
 
 **How it works**
