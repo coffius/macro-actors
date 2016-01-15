@@ -22,7 +22,7 @@ object ActorGenerator {
     val traitTypeSymbol = traitType.typeSymbol
     //get methods from a trait without a constructor
     val methods = traitType.decls.filter(_.isMethod).map(_.asMethod).filter(!_.isConstructor).toSeq
-    //translate information about trait methods in an internal structure
+    //translate information about trait methods in the internal structure
     val withParamsAndReturn = methods.map{ methodSymb =>
       val params = methodSymb.paramLists.map(_.map(_.asTerm).map(termToNameAndType))
       val returnType = methodSymb.returnType
@@ -40,9 +40,13 @@ object ActorGenerator {
     )
     val actorClassName    = actorFullName(traitTypeSymbol)
     val implClassName     = implFullName(traitTypeSymbol)
+    //compile and get the class of the proxy actor 
     val resultActorClass  = compiler.compile(actorClassName, codeString)
+    //compile and get the class of the sender proxy
     val proxyClass        = compiler.compile(implClassName, codeString)
+    //create an instance of the proxy actor 
     val actorRef = actorSystem.actorOf(Props(resultActorClass, impl))
+    //create an instance of the sender proxy with the link on the proxy actor
     val proxy = proxyClass.getDeclaredConstructors.head.newInstance(actorRef).asInstanceOf[Trait]
     proxy
   }
@@ -192,9 +196,15 @@ object ActorGenerator {
      """.stripMargin
   }
 
-  def generateCode(traitTypeSymbol: ru.Symbol, withParamsAndReturn: Seq[MethodDesc]): String = {
-    val actorCode = generateActorCode(traitTypeSymbol, withParamsAndReturn)
-    val implCode  = generateImplCode (traitTypeSymbol, withParamsAndReturn)
+  /**
+   * Generate a scala code for the proxy actor and the sender proxy
+   * @param traitTypeSymbol information about trait
+   * @param methodDescs description of methods in the trait
+   * @return string with generated scala code
+   */
+  def generateCode(traitTypeSymbol: ru.Symbol, methodDescs: Seq[MethodDesc]): String = {
+    val actorCode = generateActorCode(traitTypeSymbol, methodDescs)
+    val implCode  = generateImplCode (traitTypeSymbol, methodDescs)
     val pkgName = packageName(traitTypeSymbol)
     s"""
        |package $pkgName
