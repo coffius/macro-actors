@@ -69,4 +69,5 @@ Right now the implementation is very simple.
 1. Then this string is compiled by the scala compiler and outcome classes are loaded to JVM.
 1. Then objects of these classes are instantiated and connected together
 1. And the proxy sender object returns as a result of `ActorGenerator.gen[TraitType](...)`
+
 Though this implementation can be replaced in the future(for macros for example), the main idea will remain the same.
