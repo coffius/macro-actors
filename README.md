@@ -24,7 +24,11 @@ and you want to work with a distributed implementation of this interface transpa
 For this case you can use Akka Actors. But if you want to make it transparent for other code you must create several intermediate classes using actors.
 
 ```scala
-//Define proxy sender - it sends messages to the `actorRef`
+// Messages for the actor
+case class helloMsg(name: String)
+case class goodByeMsg(name: String)
+
+//Define proxy sender - it sends the messages to the `actorRef` and receives its answers
 class SimpleServiceActorImpl(private val actorRef: ActorRef) extends SimpleService {
    private implicit val timeout = Timeout(5 seconds)
    override def hello(name: String): scala.concurrent.Future[String] = {
@@ -35,10 +39,7 @@ class SimpleServiceActorImpl(private val actorRef: ActorRef) extends SimpleServi
    }
 }
 
-//Define ProxyActor - it receives messages and execute corresponding methods of implementation
-case class helloMsg(name: String)
-case class goodByeMsg(name: String)
-
+//Define ProxyActor - it receives messages, executes corresponding methods of the implementation and returns results.
 class SimpleServiceProxyActor(private val internalImpl: SimpleService) extends Actor {
   import context.dispatcher
   def receive = {
